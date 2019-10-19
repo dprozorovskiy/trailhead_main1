@@ -1,0 +1,6 @@
+<aura:component >
+    <lightning:button label="Toggle" variant="brand" onclick="{!c.toggle}"/>
+    <div class="exampleHolder">
+        <lightning:spinner aura:id="mySpinner" />
+    </div>
+</aura:component>

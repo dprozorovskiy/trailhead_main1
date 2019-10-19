@@ -1,0 +1,704 @@
+<aura:component description="ReportPage is used to manage all the UI" controller="ReportPage"  access="global" >
+
+    <aura:handler value="{!this}" name="init" action="{!c.doInit}" />
+    <aura:attribute name="recordId" type="String" description="This is for storing campaign overview Id"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false" description="To Showing the spinner"/>
+    <aura:attribute name="configPopup" type="Boolean" default="false" description="to hide the report config popup"/>
+    <aura:attribute name="isWeekly" type="Boolean" default="true" description="to show the weekly view" />
+    <aura:attribute name="isSelectedConfig" type="Boolean" default="false" description="if confige is select for calculation" />
+    <aura:attribute name="isReportConfig" type="Boolean" default="false" description="if report is successfully built" />
+    <aura:attribute name="campaignOverviewHeader" type="Object" default="" description="this is for storing all the header value in the campaign overview"/>
+    <aura:attribute name="CampaignDateTimeline" type="Object" default="" description="this is for storing all the date in timeline of campaign overview" />
+    <aura:attribute name="savedReportConfiguration" type="Report_Configuration__c" default="{'sobjectType':'Report_Configuration__c'}" description="storing saved report configuration." />
+    <aura:attribute name="reportConfigurationObj" type="Report_Configuration__c" default="{'sobjectType':'Report_Configuration__c'}" description="selecting report configurations." />
+    <aura:attribute name="reportConfigurationList" type="Report_Configuration__c[]" description="showing list of all realted configurations." />
+    <aura:attribute name="campaignFields" type="Object[]" description="storing all campaign fields with label" />
+    <aura:attribute name="tooltipTop" type="String" default="-99999" description="setting tooltip position" />
+    <aura:attribute name="tooltipLeft" type="String" default="-99999" description="setting tooltip position" />
+    <aura:attribute name="tooltipDomainTop" type="String" default="-99999" description="setting tooltip position" />
+    <aura:attribute name="tooltipDomainLeft" type="String" default="-99999" description="setting tooltip position" />
+    <aura:attribute name="TimelineHeader" type="Object" description="manege timeline header values" />
+    <aura:attribute name="domainCurrencyFields" type="Object[]" description="storing all domain service fields with label" />
+    <aura:attribute name="timelineRecords" type="Object[]" description="storing all the timeline records." />
+    <aura:attribute name="campaignRecordList" type="Object[]" description="stroed all the campaign reacods in this" />
+    <aura:attribute name="campaignPopupObj" type="Havas_Campaign__c" default="{'sobjectType':'Havas_Campaign__c'}" description="stored campaign showing in the popovers" />
+    <aura:attribute name="domainPopupObj" type="Havas_Domain__c" default="{'sobjectType':'Havas_Domain__c'}" description="stored domain showing in the popovers." />
+    <aura:attribute name="isEdit" type="Boolean" default="false" description="this is for editing configures names." />
+    <aura:attribute name="timelineWidth" type="String" default="900" description="this is for width arrangement of dynamically." />
+    <aura:attribute name="timelineHeight" type="String" default="auto" description="this is for height arrangement of dynamically." />
+    <aura:attribute name="dontShow" type="Boolean" default="false" description="this is for hide report when user opem it on below 550px width screen." />
+
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <lightning:spinner variant="brand" class="{!v.showSpinner == true ? 'slds-show' : 'slds-hide'}" size="large"/>
+    <aura:if isTrue="{!!v.dontShow}">
+        <div id="Header" class="slds-page-header">
+            <div class="slds-grid">
+                <div class="slds-col slds-has-flexi-truncate">
+                    <div class="slds-media slds-no-space slds-grow">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-opportunity" title="Description of icon when needed">
+                                <lightning:icon iconName="custom:custom62"  />
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <nav>
+                                <ol class="slds-breadcrumb slds-line-height_reset">
+                                    <li class="slds-breadcrumb__item">
+                                        <span>Campaign Overview</span>
+                                    </li>
+                                </ol>
+                            </nav>
+                            <h1 class="slds-page-header__title slds-m-right_small slds-align-middle slds-truncate" title="{!v.campaignOverviewHeader.Name}">{!v.campaignOverviewHeader.Name}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-no-flex slds-grid slds-align-top">
+                    <lightning:buttonIcon iconName="utility:back" alternativeText="Back to Record" variant="border-filled" class="fillConfig" onclick="{!c.backtoRecord}" />
+                    <lightning:buttonIcon iconName="utility:refresh" disabled="{!v.isReportConfig != true ? false : true}" alternativeText="Refresh" variant="border-filled" class="fillConfig" onclick="{!c.refreshPage}" />
+                    <lightning:buttonIcon iconName="utility:filterList" disabled="{!v.isReportConfig != true ? false : true}" alternativeText="Configurations" variant="border-filled" class="fillConfig" onclick="{!c.showFilterList}" />
+                    <lightning:buttonIcon iconName="utility:settings" alternativeText="Create Configuration" variant="border-filled" class="fillConfig" onclick="{!c.configPopup}" />
+                </div>
+            </div>
+            <ul class="slds-grid slds-wrap slds-page-header__detail-row">
+                <li class="slds-page-header__detail-block">
+                    <p class="slds-text-title slds-truncate slds-m-bottom_xx-small" style="font-weight:550;" title="Company Name">Company Name</p>
+                    <p class="slds-text-body_regular slds-truncate" style="max-width:180px;" title="{!v.campaignOverviewHeader.CompanyName}">{!v.campaignOverviewHeader.CompanyName}</p>
+                </li>
+                <li class="slds-page-header__detail-block">
+                    <p class="slds-text-title slds-truncate slds-m-bottom_xx-small" style="font-weight:550;" title="Start Date">Start Date</p>
+                    <p class="slds-text-body_regular slds-truncate" title="{!v.campaignOverviewHeader.StartDate}"><ui:outputDate value="{!v.campaignOverviewHeader.StartDate}" format="DD-MM-YYYY" /></p>
+                </li>
+                <li class="slds-page-header__detail-block">
+                    <p class="slds-text-title slds-truncate slds-m-bottom_xx-small" style="font-weight:550;" title="End Date">End Date</p>
+                    <p class="slds-text-body_regular slds-truncate" title="{!v.campaignOverviewHeader.EndDate}"><ui:outputDate value="{!v.campaignOverviewHeader.EndDate}" format="DD-MM-YYYY" /></p>
+                </li>
+                <li class="slds-page-header__detail-block">
+                    <p class="slds-text-title slds-truncate slds-m-bottom_xx-small" style="font-weight:550;" title="Contact Person">Contact Person</p>
+                    <p class="slds-text-body_regular slds-truncate" style="max-width:180px;" title="{!v.campaignOverviewHeader.ContactPerson}">{!v.campaignOverviewHeader.ContactPerson}</p>
+                </li>
+                <li class="slds-page-header__detail-block">
+                    <p class="slds-text-title slds-truncate slds-m-bottom_xx-small" style="font-weight:550;" title="Budget Briefed">Budget Briefed</p>
+                    <p class="slds-text-body_regular slds-truncate" title="{!v.campaignOverviewHeader.BudgetBriefed}"><lightning:formattedNumber value="{!v.campaignOverviewHeader.BudgetBriefed}" style="currency" /></p>
+                </li>
+                <li class="slds-page-header__detail-block">
+                    <p class="slds-text-title slds-truncate slds-m-bottom_xx-small" style="font-weight:550;" title="Budget Planned">Budget Planned</p>
+                    <p class="slds-text-body_regular slds-truncate" title="{!v.campaignOverviewHeader.BudgetPlanned}"><ui:outputCurrency value="{!v.campaignOverviewHeader.BudgetPlanned}"   /></p>
+                </li>
+                <li class="slds-page-header__detail-block">
+                    <p class="slds-text-title slds-truncate slds-m-bottom_xx-small" style="font-weight:550;" title="Budget Approved">Budget Approved</p>
+                    <p class="slds-text-body_regular slds-truncate" title="{!v.campaignOverviewHeader.BudgetApproved}"><ui:outputCurrency value="{!v.campaignOverviewHeader.BudgetApproved}"   /></p>
+                </li>
+                <li class="slds-page-header__detail-block">
+                    <p class="slds-text-title slds-truncate slds-m-bottom_xx-small" style="font-weight:550;" title="Budget Remaining">Budget Remaining</p>
+                    <p class="slds-text-body_regular slds-truncate" title="{!v.campaignOverviewHeader.BudgetRemaining}"><ui:outputCurrency value="{!v.campaignOverviewHeader.BudgetRemaining}"   /></p>
+                </li>
+                <li class="slds-page-header__detail-block">
+                    <p class="slds-text-title slds-truncate slds-m-bottom_xx-small" style="font-weight:550;" title="Actual Spend">Actual Spend</p>
+                    <p class="slds-text-body_regular slds-truncate" title="{!v.campaignOverviewHeader.ActualSpend}"><ui:outputCurrency value="{!v.campaignOverviewHeader.ActualSpend}"   /></p>
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <div aura:id="tooltip" class="tooltip" style="{!'width:300px;position: fixed;display:block;top:'+v.tooltipTop+'px;left:'+v.tooltipLeft+'px;'}">
+                <div class="slds-grid slds-wrap slds-gutters">
+                    <div class="slds-col slds-size--1-of-2">
+                        <span>Phase</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  {!v.campaignPopupObj.CampaignRecord.Phase__c}</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>Start Date</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  <ui:outputDate value="{!v.campaignPopupObj.CampaignRecord.Start_Date__c}" format="DD-MM-YYYY" /></span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>End Date</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  <ui:outputDate value="{!v.campaignPopupObj.CampaignRecord.End_Date__c}" format="DD-MM-YYYY" /></span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>Product Brand</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  {!v.campaignPopupObj.CampaignRecord.Product_Brand__r.Name}</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>Product Category</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  {!v.campaignPopupObj.CampaignRecord.Product_Category__r.Name}</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>Budget Planned</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  <ui:outputCurrency value="{!v.campaignPopupObj.CampaignRecord.Budget_Planned__c}" /></span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>Budget Approved</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  <ui:outputCurrency value="{!v.campaignPopupObj.CampaignRecord.Budget_Approved__c}" /></span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>Actual Spend</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  <ui:outputCurrency value="{!v.campaignPopupObj.CampaignRecord.Actual_Spend__c}" /></span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>Budget Available</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  <ui:outputCurrency value="{!v.campaignPopupObj.CampaignRecord.Budget_Available__c}" /></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div aura:id="tooltipForDomain" class="tooltip" style="{!'width:300px;position: fixed;display:block;top:'+v.tooltipDomainTop+'px;left:'+v.tooltipDomainLeft+'px;'}">
+                <div class="slds-grid slds-wrap slds-gutters">
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>Start Date</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  <ui:outputDate value="{!v.domainPopupObj.Start_Date__c}" format="DD-MM-YYYY" /></span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>End Date</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  <ui:outputDate value="{!v.domainPopupObj.End_Date__c}" format="DD-MM-YYYY" /></span>
+                    </div>
+
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>Domain Budget</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  <ui:outputCurrency value="{!v.domainPopupObj.Domain_Budget__c}" /></span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>Budget Available</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  <ui:outputCurrency value="{!v.domainPopupObj.Budget_Available__c}" /></span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>Actual Spend</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b>  <ui:outputCurrency value="{!v.domainPopupObj.Actual_Spend__c}" /></span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span>Details</span>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-truncate">
+                        <span><b>: </b></span>
+                    </div>
+                    <div class="slds-col slds-size_2-of-2">
+                        <div class="text ellipsis">
+                            <span class="text-concat">{!v.domainPopupObj.Details__c}</span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="Report_Page" class="slds-m-top--xx-small">
+            <div aura:id="ReportContainer" class=" slds-grid style-7 slds-p-top--xx-small slds-scrollable--y ReportContainer" style="">
+                <aura:if isTrue="{!v.isReportConfig}">
+                    <aura:if isTrue="{!v.reportConfigurationList.length>0}">
+                        <div class="slds-col slds-p-around_large">
+                            <h1 class="slds-p-around_xx-small" style="background-color:#f3f2f2;"><b>List of available report configurations</b></h1>
+                            <table class="slds-table slds-m-top--small slds-table_bordered">
+                                <tr>
+                                    <th><b>Select</b></th>
+                                    <th><b>Name</b></th>
+                                    <th><b>Start Date</b></th>
+                                    <th><b>End Date</b></th>
+                                    <th><b>Timeline</b></th>
+                                    <th><b>Created Date</b></th>
+                                </tr>
+                                <aura:iteration items="{!v.reportConfigurationList}" var="cList" >
+                                    <tr>
+                                        <td><lightning:input label="" name="radio" type="radio" value="{!cList.Id}" onchange="{!c.selectedReportConfig}" /> </td>
+                                        <td>{!cList.Name}</td>
+                                        <td><ui:outputDate value="{!cList.Start_Date__c}" format="DD-MM-YYYY" /></td>
+                                        <td><ui:outputDate value="{!cList.End_Date__c}" format="DD-MM-YYYY" /></td>
+                                        <td>{!cList.Monthly_Timeline__c == true ? 'Monthly' : 'Weekly'}</td>
+                                        <td><ui:outputDate value="{!cList.CreatedDate}" format="DD-MM-YYYY" /></td>
+                                    </tr>
+                                </aura:iteration>
+                            </table>
+                            <div class="slds-p-top--small slds-float_right slds-p-bottom--medium">
+                                <lightning:button label="View Report" disabled="{!v.savedReportConfiguration.Id != null ? false : true}" variant="brand" iconName="utility:preview" onclick="{!c.viewReport}"  />
+                            </div>
+                        </div>
+                        <aura:set attribute="else" >
+                            <div class="slds-col slds-p-around_large">
+                                <h1 class="slds-p-around_xx-small" style="background-color:#f3f2f2;"><b>List of available report configurations</b></h1>
+                                <table class="slds-table slds-m-top--small slds-table_bordered">
+                                    <tr>
+                                        <td><p class="slds-align_absolute-center slds-required">No configuration record found!</p></td>
+                                    </tr>
+                                </table>
+                                <div class="slds-p-top--small slds-float_right">
+                                    <lightning:button label="Create Configuration" variant="brand" iconName="utility:add" onclick="{!c.configPopup}"  />
+                                </div>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </aura:if>
+                <aura:if isTrue="{!v.isSelectedConfig}">
+                    <div aura:id="CampaignFilterTable" >
+                        <table id="CampaignFilterTableId" class="slds-scrollable--x style-7">
+                            <tr style="{!v.isWeekly == true ? 'height: 21px;' : 'height: 20px;'}">
+                                <td class="slds-truncate" colspan="3">
+                                    <div class="slds-grid width420PX" >
+                                        <div class="slds-col slds-align_absolute-center">
+                                            <aura:if isTrue="{!!v.isEdit}">
+                                                <lightning:buttonIcon iconName="utility:edit" size="small" class="" variant="bare" alternativeText="Edit Configuration Name" onclick="{!c.editConfigName}" />
+                                                <aura:set attribute="else" >
+                                                    <lightning:buttonIcon iconName="utility:save" size="small" class="" variant="bare" alternativeText="Save Configuration Name" onclick="{!c.saveConfigName}" />
+                                                </aura:set>
+                                            </aura:if>
+                                        </div>
+                                        <div class="slds-col">
+                                            <aura:if isTrue="{!!v.isEdit}">
+                                                <p class="slds-truncate" style="width:300px;"><b>Configuration Name: <i><u>{!v.savedReportConfiguration.Name}</u></i></b></p>
+                                                <aura:set attribute="else" >
+                                                    <b>Configuration Name: </b><ui:inputText value="{!v.savedReportConfiguration.Name}" class="inputEdit" />
+                                                </aura:set>
+                                            </aura:if>
+                                        </div>
+                                    </div>
+
+                                </td>
+                                <td class="">
+                                    <p class="width57PX">&nbsp;</p>
+                                </td>
+                            </tr>
+                            <aura:if isTrue="{!v.isWeekly}">
+                                <tr>
+                                    <td class="">
+                                        <p class="width190PX">&nbsp;</p>
+                                    </td>
+                                    <td class="">
+                                        <p class="width190PX">&nbsp;</p>
+                                    </td>
+                                    <td class="">
+                                        <p class="width190PX">&nbsp;</p>
+                                    </td>
+                                    <td class="">
+                                        <p class="width57PX">&nbsp;</p>
+                                    </td>
+                                </tr>
+                            </aura:if>
+                            <tr class="borderHeader">
+                                <aura:if isTrue="{!v.timelineRecords.length > 0}">
+                                    <td class="HeaderDimGray">
+                                        <p class="width190PX">{!v.TimelineHeader.campaignFilter1 != null ? v.TimelineHeader.campaignFilter1 : '(Campaign Filter 1)'}</p>
+                                    </td>
+                                    <td class="HeaderDimGray">
+                                        <p class="width190PX">{!v.TimelineHeader.campaignFilter2 != null ? v.TimelineHeader.campaignFilter2 : '(Campaign Filter 2)'}</p>
+                                    </td>
+                                    <td class="HeaderDimGray">
+                                        <p class="width190PX slds-text-align--right slds-p-right--xx-large">{!v.TimelineHeader.domainServiceFilter != null ? v.TimelineHeader.domainServiceFilter : '(Amount Filter)'}</p>
+                                    </td>
+                                    <td class="HeaderDimGray">
+                                        <p class="width57PX slds-align_absolute-center">Days</p>
+                                    </td>
+                                </aura:if>
+                            </tr>
+
+                            <aura:iteration items="{!v.timelineRecords}" var="CFV" >
+
+                                <tr class="subBorderHeader campaignHeader" id="{!CFV.CampaignId}" onmouseover="{!c.showTooltip}" onmouseout="{!c.hideTooltip}" >
+                                    <td style="" >
+                                        <p class="width190PX" title="{!CFV.CampaignFilter1Header}">{!CFV.CampaignFilter1Header}</p>
+                                    </td>
+                                    <td style="" >
+                                        <p class="width190PX" title="{!CFV.CampaignFilter2Header}">{!CFV.CampaignFilter2Header}</p>
+                                    </td>
+                                    <td style="" >
+                                        <p class="slds-text-align--right" style="width:140px;padding-right: .5rem;"><ui:outputCurrency value="{!CFV.DomainServiceFilterValue}" class=" slds-p-right--large" /></p>
+                                    </td>
+                                    <td style="" >
+                                        <p class="width57PX slds-align_absolute-center">{!CFV.Days}</p>
+                                    </td>
+                                </tr>
+                                <tr style="border-right: 1px solid black;" class="timelineHeader" >
+                                    <td style="width:465px;" colspan="4" id="{!CFV.CampaignId}" onmouseover="{!c.showTooltip}" onmouseout="{!c.hideTooltip}" >
+                                        <div class="slds-grid slds-truncate slds-p-horizontal_x-small" >
+                                            <div class="slds-col slds-p-right--x-small slds-float--left">
+                                                <aura:if isTrue="{!CFV.CampaignTimeline1HeaderType == 'CURRENCY'}">
+                                                    <span class="slds-float_right"><ui:outputCurrency value="{!CFV.CampaignTimeline1Header}" /></span>
+                                                    <aura:set attribute="else">
+                                                        <span>{!CFV.CampaignTimeline1Header == 'Campaign' ? 'Campaign '+(index+1) : CFV.CampaignTimeline1Header}</span>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </div>
+                                            <div class="slds-col slds-p-right--x-small slds-align_absolute-center">
+                                                <aura:if isTrue="{!CFV.CampaignTimeline2HeaderType == 'CURRENCY'}">
+                                                    <span class="slds-float_right"><ui:outputCurrency value="{!CFV.CampaignTimeline2Header}" /></span>
+                                                    <aura:set attribute="else">
+                                                        <span class="slds-float_right">{!CFV.CampaignTimeline2Header}</span>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </div>
+                                            <div class="slds-col ">
+                                                <aura:if isTrue="{!CFV.CampaignTimeline3HeaderType == 'CURRENCY'}">
+                                                    <span class="slds-float_right"><ui:outputCurrency value="{!CFV.CampaignTimeline3Header}" /></span>
+                                                    <aura:set attribute="else">
+                                                        <span class="slds-float_right">{!CFV.CampaignTimeline3Header}</span>
+                                                    </aura:set>
+                                                </aura:if>
+
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <aura:iteration items="{!CFV.childDomainFilters}" var="CFVchild" indexVar="index" >
+                                    <tr class="borderOutsetChildRIGHT"  id="{!CFVchild.campaignId}" accessKey="{!CFVchild.domainId}" onmouseover="{!c.showDomainTooltip}" onmouseout="{!c.hideDomainTooltip}">
+                                        <td class="{!CFVchild.TD_color}">
+                                            <p class="width190PX" title="{!CFVchild.recordType}">{!CFVchild.recordType}</p>
+                                        </td>
+                                        <td class="{!CFVchild.TD_color}">
+                                            <p class="width190PX">{!CFVchild.domainServiceName}</p>
+                                        </td>
+                                        <td class="{!CFVchild.TD_color}" >
+                                            <p class="slds-text-align--right" style="width:140px;padding-right: .5rem;"><ui:outputCurrency value="{!CFVchild.domainServiceCurrency}" class="slds-p-right--large" /></p>
+                                        </td>
+                                        <td class="{!CFVchild.TD_color}" >
+                                            <p class="width57PX slds-align_absolute-center">{!CFVchild.Days}</p>
+                                        </td>
+                                    </tr>
+                                </aura:iteration>
+                                <tr style="border-top: 1px solid black;">
+                                    <td style="background-color:#DBE5F1;" >
+                                        <p class="width190PX slds-align_absolute-center" >&nbsp;</p>
+                                    </td>
+                                    <td style="background-color:#DBE5F1;" >
+                                        <p class="width190PX slds-align_absolute-center">&nbsp;</p>
+                                    </td>
+                                    <td style="background-color:#DBE5F1;" >
+                                        <p class="width190PX slds-align_absolute-center">&nbsp;</p>
+                                    </td>
+                                    <td style="background-color:#DBE5F1;" >
+                                        <p class="width57PX slds-align_absolute-center">&nbsp;</p>
+                                    </td>
+
+                                </tr>
+                            </aura:iteration>
+                        </table>
+                    </div>
+                    <div aura:id="timelineFilterDiv" class=" slds-scrollable--x slds-m-right_xx-small style-7" style="{!'display:block;width:'+v.timelineWidth+'px;height:'+v.timelineHeight+';'}" >
+                        <table  >
+                        <aura:if isTrue="{!v.isWeekly}" >
+
+                                <tr>
+                                    <aura:iteration items="{!v.CampaignDateTimeline.weekValue}" var="CDI" indexVar="index">
+                                        <td  class="slds-box_border" colspan="7" style="border-radius: 0;">
+                                            <p class="slds-align_absolute-center" title="{!CDI}" style="width:140px;"  >{!CDI}</p>
+                                        </td>
+                                    </aura:iteration>
+                                </tr>
+
+                                <tr>
+                                    <aura:iteration items="{!v.CampaignDateTimeline.campaignDateInterval}" var="CDI" indexVar="index">
+                                        <aura:if isTrue="{!v.CampaignDateTimeline.campaignDateInterval.length - (index) > mod(v.CampaignDateTimeline.campaignDateInterval.length,7) ? true : false}">
+                                            <td  class="slds-box_border" style="background-color: #e6e6e6;border-radius: 0;">
+                                                <p class="width20PX slds-align_absolute-center" title="{!CDI.completeDate}" style="" >{!CDI.day}</p>
+                                            </td>
+                                            <aura:set attribute="else" >
+                                                <aura:if isTrue="{!mod(v.CampaignDateTimeline.campaignDateInterval.length,7) == 1 ? true : false}">
+                                                <td class="slds-box_border" colspan="1" style="background-color: #e6e6e6;border-radius: 0;">
+                                                    <p class=" slds-align_absolute-center" title="{!CDI.completeDate}" style="width:140px;" >{!CDI.day}</p>
+                                                </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!mod(v.CampaignDateTimeline.campaignDateInterval.length,7) == 2 ? true : false}">
+                                                    <td width="" class="slds-box_border" colspan="1" style="background-color: #e6e6e6;border-radius: 0;">
+                                                        <p class=" slds-align_absolute-center" title="{!CDI.completeDate}" style="width:70px;" >{!CDI.day}</p>
+                                                    </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!mod(v.CampaignDateTimeline.campaignDateInterval.length,7) == 3 ? true : false}">
+                                                    <td width="" class="slds-box_border" colspan="1" style="background-color: #e6e6e6;border-radius: 0;">
+                                                        <p class=" slds-align_absolute-center" title="{!CDI.completeDate}" style="width:46px;" >{!CDI.day}</p>
+                                                    </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!mod(v.CampaignDateTimeline.campaignDateInterval.length,7) == 4 ? true : false}">
+                                                    <td width="" class="slds-box_border" colspan="1" style="background-color: #e6e6e6;border-radius: 0;">
+                                                        <p class=" slds-align_absolute-center" title="{!CDI.completeDate}" style="width:35px;" >{!CDI.day}</p>
+                                                    </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!mod(v.CampaignDateTimeline.campaignDateInterval.length,7) == 5 ? true : false}">
+                                                    <td width="" class="slds-box_border" colspan="1" style="background-color: #e6e6e6;border-radius: 0;">
+                                                        <p class=" slds-align_absolute-center" title="{!CDI.completeDate}" style="width:26px;" >{!CDI.day}</p>
+                                                    </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!mod(v.CampaignDateTimeline.campaignDateInterval.length,7) == 6 ? true : false}">
+                                                    <td width="" class="slds-box_border" colspan="1" style="background-color: #e6e6e6;border-radius: 0;">
+                                                        <p class=" slds-align_absolute-center" title="{!CDI.completeDate}" style="width:23px;" >{!CDI.day}</p>
+                                                    </td>
+                                                </aura:if>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:iteration>
+                                </tr>
+
+                                <tr>
+                                    <aura:iteration items="{!v.CampaignDateTimeline.campaignDateInterval}" var="CDI" indexVar="index">
+                                        <aura:if isTrue="{!v.CampaignDateTimeline.campaignDateInterval.length - (index) > mod(v.CampaignDateTimeline.campaignDateInterval.length,7) ? true : false}">
+                                            <td  class="slds-box_border HeaderDimGray" style="border-radius: 0;font-size: 13px;">
+                                                <p class="width20PX slds-align_absolute-center" title="{!CDI.dayOfWeek}" style="" >{!CDI.dayOfWeekFistLetter}</p>
+                                            </td>
+                                            <aura:set attribute="else" >
+                                                <aura:if isTrue="{!mod(v.CampaignDateTimeline.campaignDateInterval.length,7) == 1 ? true : false}">
+                                                    <td class="slds-box_border HeaderDimGray" colspan="1" style="border-radius: 0;">
+                                                        <p class=" slds-align_absolute-center" title="{!CDI.dayOfWeek}" style="width:140px;font-size: 13px;" >{!CDI.dayOfWeekFistLetter}</p>
+                                                    </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!mod(v.CampaignDateTimeline.campaignDateInterval.length,7) == 2 ? true : false}">
+                                                    <td width="" class="slds-box_border HeaderDimGray" colspan="1" style="border-radius: 0;">
+                                                        <p class=" slds-align_absolute-center" title="{!CDI.dayOfWeek}" style="width:70px;font-size: 13px;" >{!CDI.dayOfWeekFistLetter}</p>
+                                                    </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!mod(v.CampaignDateTimeline.campaignDateInterval.length,7) == 3 ? true : false}">
+                                                    <td width="" class="slds-box_border HeaderDimGray" colspan="1" style="border-radius: 0;">
+                                                        <p class=" slds-align_absolute-center" title="{!CDI.dayOfWeek}" style="width:46px;font-size: 13px;" >{!CDI.dayOfWeekFistLetter}</p>
+                                                    </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!mod(v.CampaignDateTimeline.campaignDateInterval.length,7) == 4 ? true : false}">
+                                                    <td width="" class="slds-box_border HeaderDimGray" colspan="1" style="border-radius: 0;">
+                                                        <p class=" slds-align_absolute-center" title="{!CDI.dayOfWeek}" style="width:35px;font-size: 13px;" >{!CDI.dayOfWeekFistLetter}</p>
+                                                    </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!mod(v.CampaignDateTimeline.campaignDateInterval.length,7) == 5 ? true : false}">
+                                                    <td width="" class="slds-box_border HeaderDimGray" colspan="1" style="border-radius: 0;">
+                                                        <p class=" slds-align_absolute-center" title="{!CDI.dayOfWeek}" style="width:26px;font-size: 13px;" >{!CDI.dayOfWeekFistLetter}</p>
+                                                    </td>
+                                                </aura:if>
+                                                <aura:if isTrue="{!mod(v.CampaignDateTimeline.campaignDateInterval.length,7) == 6 ? true : false}">
+                                                    <td width="" class="slds-box_border HeaderDimGray" colspan="1" style="border-radius: 0;">
+                                                        <p class=" slds-align_absolute-center" title="{!CDI.dayOfWeek}" style="width:23px;font-size: 13px;" >{!CDI.dayOfWeekFistLetter}</p>
+                                                    </td>
+                                                </aura:if>
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:iteration>
+                                </tr>
+                            <aura:set attribute="else" >
+                                <tr>
+                                    <aura:iteration items="{!v.CampaignDateTimeline.campaignMonthInterval}" var="CDI" indexVar="index">
+                                        <td  class="slds-box_border timelineBorder" colspan="{!CDI.monthColSpan}" style="border-radius: 0;" >
+                                            <p class="slds-align_absolute-center" title="{!CDI.monthlyValue}" style="min-width: 400px;"  >{!CDI.monthlyValue}</p>
+                                        </td>
+                                    </aura:iteration>
+                                </tr>
+
+                                <tr>
+                                    <aura:iteration items="{!v.CampaignDateTimeline.weekValue}" var="CDI" indexVar="index">
+                                        <td  class="slds-box_border HeaderDimGray timelineBorder" colspan="7" style="border-radius: 0;font-size: 13px;">
+                                            <p class="slds-align_absolute-center" title="{!CDI}" style="width:140px;"  >{!CDI}</p>
+                                        </td>
+                                    </aura:iteration>
+                                </tr>
+                            </aura:set>
+                        </aura:if>
+                            <aura:iteration items="{!v.timelineRecords}" var="trecords" indexVar="index" >
+                                <tr  style="border-top: 1px solid white;">
+                                    <td colspan="{!trecords.totalDays}">
+                                        &nbsp;
+                                    </td>
+                                </tr>
+
+                                <tr  >
+                                    <aura:if isTrue="{!trecords.CampaignTimeline.ColSpanStart != 0}">
+                                        <td colspan="{!trecords.CampaignTimeline.ColSpanStart}" >
+                                            &nbsp;
+                                        </td>
+                                    </aura:if>
+                                    <td colspan="{!trecords.CampaignTimeline.ColSpanMiddle}" class="timelineHeader" id="{!trecords.CampaignId}" onmouseover="{!c.showTooltip}" onmouseout="{!c.hideTooltip}" >
+                                        <div class="slds-grid slds-truncate slds-p-horizontal_x-small" >
+                                            <div class="slds-col slds-p-right--x-small slds-float--left">
+                                                <aura:if isTrue="{!trecords.CampaignTimeline.CampaignTimeline1HeaderType == 'CURRENCY'}">
+                                                    <span class="slds-float_right"><ui:outputCurrency value="{!trecords.CampaignTimeline.CampaignTimeline1Header}" /></span>
+                                                    <aura:set attribute="else">
+                                                        <span>{!trecords.CampaignTimeline.CampaignTimeline1Header == 'Campaign' ? 'Campaign '+(index+1) : trecords.CampaignTimeline.CampaignTimeline1Header}</span>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </div>
+                                            <div class="slds-col slds-p-right--x-small slds-align_absolute-center">
+                                                <aura:if isTrue="{!trecords.CampaignTimeline.CampaignTimeline2HeaderType == 'CURRENCY'}">
+                                                    <span class="slds-float_right"><ui:outputCurrency value="{!trecords.CampaignTimeline.CampaignTimeline2Header}" /></span>
+                                                    <aura:set attribute="else">
+                                                        <span class="slds-float_right">{!trecords.CampaignTimeline.CampaignTimeline2Header}</span>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </div>
+                                            <div class="slds-col ">
+                                                <aura:if isTrue="{!trecords.CampaignTimeline.CampaignTimeline3HeaderType == 'CURRENCY'}">
+                                                    <span class="slds-float_right"><ui:outputCurrency value="{!trecords.CampaignTimeline.CampaignTimeline3Header}" /></span>
+                                                    <aura:set attribute="else">
+                                                        <span class="slds-float_right">{!trecords.CampaignTimeline.CampaignTimeline3Header}</span>
+                                                    </aura:set>
+                                                </aura:if>
+
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td colspan="{!trecords.CampaignTimeline.ColSpanLast}" >
+                                        &nbsp;
+                                    </td>
+                                </tr>
+
+                                <aura:iteration items="{!trecords.CampaignTimeline.DomainTimeline}" var="DTL" indexVar="index">
+                                    <tr  >
+                                        <aura:if isTrue="{!DTL.ColSpanStart != 0}">
+                                            <td colspan="{!DTL.ColSpanStart}" >
+                                                &nbsp;
+                                            </td>
+                                        </aura:if>
+                                        <td colspan="{!DTL.ColSpanMiddle}" class="{!DTL.TD_color}" id="{!trecords.CampaignId}" accessKey="{!DTL.domainId}" onmouseover="{!c.showDomainTooltip}" onmouseout="{!c.hideDomainTooltip}">
+                                            <div class="slds-grid slds-truncate" >
+                                                <div class="slds-col slds-p-right--small">
+                                                    <p class="slds-p-left--small">{!DTL.recordType}  -  {!DTL.domainServiceName}</p>
+                                                </div>
+                                                <div class="slds-col">
+                                                    <p class="slds-float_right slds-p-right--small"><ui:outputCurrency value="{!DTL.domainServiceCurrency}"   /></p>
+                                                </div>
+                                            </div>
+
+                                        </td>
+                                        <td colspan="{!DTL.ColSpanLast}" >
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                </aura:iteration>
+                                <tr style="border-top: 1px solid white;">
+                                    <td colspan="{!trecords.totalDays}">
+                                        &nbsp;
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </table>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+
+        <aura:if isTrue="{!v.configPopup}">
+            <div id="configPopup" class="demo-only" style="height: 640px;">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container" style="min-width: 75rem;padding-top: 160px;">
+                        <header class="slds-modal__header">
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeConfigPopup}">
+                                <lightning:icon iconName="utility:close" alternativeText="Close" size="small" variant="bare" />
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Custom Configurations</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <h1 class="slds-p-left--x-small" style="font-size:16px;background-color:lightgray;"> Campaign Filters</h1>
+                            <lightning:layout horizontalAlign="space" multipleRows="true" class="slds-p-top--small">
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="3">
+                                    <lightning:input name="name" label="Configure Name" value="{!v.reportConfigurationObj.Name}" type="text" placeholder="eg: abc" required="true" aura:id="configName" />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="3">
+                                    <lightning:select name="select" label="Campaign Filter 1" aura:id="CampaignFilter1" required="true" value="{!v.reportConfigurationObj.Campaign_Filter_1__c}" messageWhenValueMissing="Did you forget to select a field?">
+                                        <option value="">-- Select --</option>
+                                        <aura:iteration items="{!v.campaignFields}" var="cf">
+                                            <option value="{!cf.ApiName}" text="{!cf.Label}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="3">
+                                    <lightning:select name="select" label="Campaign Filter 2" required="true" aura:id="CampaignFilter2" value="{!v.reportConfigurationObj.Campaign_Filter_2__c}" messageWhenValueMissing="Did you forget to select a field?">
+                                        <option value="">-- Select --</option>
+                                        <aura:iteration items="{!v.campaignFields}" var="cf">
+                                            <option value="{!cf.ApiName}" text="{!cf.Label}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="3">
+                                    <ui:inputDate label="Start Date" required="true" aura:id="StardDate" value="{!v.reportConfigurationObj.Start_Date__c}" displayDatePicker="true"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="3">
+                                    <ui:inputDate label="End Date" required="true" aura:id="EndDate" value="{!v.reportConfigurationObj.End_Date__c}" displayDatePicker="true"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="3">
+                                    <lightning:select name="select" label="Amount Filter" required="true" aura:id="DomainServiceFilter" value="{!v.reportConfigurationObj.Domain_Service_Filter__c}" messageWhenValueMissing="Did you forget to select a field?">
+                                        <option value="">-- Select --</option>
+                                        <aura:iteration items="{!v.domainCurrencyFields}" var="cf">
+                                            <option value="{!cf.ApiName}" text="{!cf.Label}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="3">
+                                    <label class="slds-form-element__label slds-m-horizontal--xx-small" >Timeline Filter</label>
+                                    <div class="slds-grid">
+                                        <div class="slds-col"><lightning:input label="Weekly" type="radio" name="timeline" checked="{!v.reportConfigurationObj.Weekly_Timeline__c}" onchange="{!c.handleRadioClick}" /></div>
+                                        <div class="slds-col"><lightning:input label="Monthly" type="radio" name="timeline" checked="{!v.reportConfigurationObj.Monthly_Timeline__c}" onchange="{!c.handleRadioClick}" /></div>
+                                    </div>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="3">
+                                </lightning:layoutItem>
+                            </lightning:layout>
+
+                            <h1 class="slds-m-top--small slds-p-left--x-small" style="font-size:16px;background-color:lightgray;"> Timeline Filters</h1>
+                            <lightning:layout horizontalAlign="space" multipleRows="true" class="slds-p-top--small">
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="3">
+                                    <lightning:select name="select" label="Campaign Filter 1" aura:id="" value="{!v.reportConfigurationObj.Timeline_Campaign_Filter_1__c}" messageWhenValueMissing="Did you forget to select a field?">
+                                        <option value="">-- Select --</option>
+                                        <aura:iteration items="{!v.campaignFields}" var="cf">
+                                            <option value="{!cf.ApiName}" text="{!cf.Label}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="1" class="p25px">
+                                    <lightning:input name="checkbox" label="Show Label" type="checkbox" checked="{!v.reportConfigurationObj.Timeline_Campaign_Label_1__c}"  />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="3">
+                                    <lightning:select name="select" label="Campaign Filter 2" aura:id="" value="{!v.reportConfigurationObj.Timeline_Campaign_Filter_2__c}" messageWhenValueMissing="Did you forget to select a field?">
+                                        <option value="">-- Select --</option>
+                                        <aura:iteration items="{!v.campaignFields}" var="cf">
+                                            <option value="{!cf.ApiName}" text="{!cf.Label}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="1" class="p25px">
+                                    <lightning:input name="checkbox" label="Show Label" type="checkbox" checked="{!v.reportConfigurationObj.Timeline_Campaign_Label_2__c}"  />
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="3">
+                                    <lightning:select name="select" label="Campaign Filter 3" aura:id="" value="{!v.reportConfigurationObj.Timeline_Campaign_Filter_3__c}" messageWhenValueMissing="Did you forget to select a field?">
+                                        <option value="">-- Select --</option>
+                                        <aura:iteration items="{!v.campaignFields}" var="cf">
+                                            <option value="{!cf.ApiName}" text="{!cf.Label}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem flexibility="auto" padding="horizontal-small" size="1" class="p25px">
+                                    <lightning:input name="checkbox" label="Show Label" type="checkbox" checked="{!v.reportConfigurationObj.Timeline_Campaign_Label_3__c}" />
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning:button iconName="utility:close" onclick="{!c.closeConfigPopup}" variant="neutral" label="Cancel" />
+                            <lightning:button iconName="utility:save" onclick="{!c.saveConfig}" variant="brand" label="Save &amp; View"  />
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </div>
+        </aura:if>
+        <aura:set attribute="else">
+            <lightning:button iconName="utility:back" variant="neutral" label="Back to Record" class="slds-size--1-of-1" onclick="{!c.backtoRecord}" />
+        </aura:set>
+    </aura:if>
+</aura:component>

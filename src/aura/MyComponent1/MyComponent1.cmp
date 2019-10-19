@@ -1,0 +1,10 @@
+<aura:component implements="force:appHostable" access="global" >
+<pre>
+ 
+Hit the below button to go to component 2 <br/>
+ 
+</pre>
+ 
+<lightning:button variant="brand" label="Go to Component 2" onclick="{!c.NavigatetoC2}" />
+ <lightning:button variant="brand" label="showToast" onclick="{!c.showToast}" />
+</aura:component>

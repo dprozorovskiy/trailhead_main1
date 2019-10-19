@@ -1,0 +1,35 @@
+<apex:page controller="CustomController" lightningStylesheets="true">
+  <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<apex:stylesheet value="{!URLFOR($Resource.slds, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+  <apex:form >
+      <apex:pageBlock title="Account List" id="accounts_list">
+          Filter: 
+          <apex:selectList value="{!filterId}" size="1">
+              <apex:selectOptions value="{!listViewOptions}"></apex:selectOptions>
+              <apex:actionSupport event="onchange" reRender="accounts_list"/>
+          </apex:selectList>
+          <apex:pageblockTable value="{!accounts}" var="a">
+              <apex:column value="{!a.Id }"/>
+              <apex:column value="{!a.Name }"/>
+              <apex:column value="{!a.BillingCity}"/>
+          </apex:pageblockTable>
+          
+      <table styleClass="slds-table slds-table--bordered slds-table--striped">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Billing City</th>
+        </tr>
+        <apex:repeat var="acc" value="{!accounts}">
+        <tr>
+            <td>{!acc.Id}</td>
+            <td>{!acc.Name}</td>
+            <td>{!acc.BillingCity}</td>
+        </tr>
+        </apex:repeat> 
+    </table>
+
+      </apex:pageBlock>
+  </apex:form>
+  </html>
+</apex:page>

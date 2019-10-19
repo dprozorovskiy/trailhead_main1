@@ -1,0 +1,20 @@
+<apex:page controller="ProductController">
+  <apex:pageBlock >
+    <apex:pageBlockSection >
+      <apex:pageBlockTable value="{!allProducts}" var="p">
+        <apex:column >
+          <apex:facet name="header">Product Name</apex:facet>
+          <apex:outputText value="{!p.name}" />
+        </apex:column>
+        <apex:column >
+          <apex:facet name="header">Price</apex:facet>
+          <apex:outputText value="£{!p.price}" />
+        </apex:column>
+        <apex:column >
+          <apex:facet name="header">Discounted Price</apex:facet>
+          <apex:outputText value="£{!p.discount}" />
+        </apex:column>
+      </apex:pageBlockTable>
+    </apex:pageBlockSection>
+  </apex:pageBlock>
+</apex:page>

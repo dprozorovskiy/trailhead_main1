@@ -1,0 +1,4 @@
+<aura:component description="CampaignOverviewReportButton" implements="force:hasRecordId,flexipage:availableForAllPageTypes" access="global">
+    <aura:attribute name="recordId" type="String"/>
+    <lightning:button label="View Report" variant="neutral" class="slds-size--1-of-1" iconName="utility:preview" title="View Report" onclick="{!c.navigateToComponent}" />
+</aura:component>

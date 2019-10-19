@@ -1,0 +1,8 @@
+<aura:component >
+    <c:helloMessageInteractive ></c:helloMessageInteractive>
+    <!--<c:helloHeading/>
+	 <p>Hello Lightning!</p>
+    <c:camping/>
+    <c:helloPlayground></c:helloPlayground>-->
+    <!--<c:campingListItem/>-->
+</aura:component>

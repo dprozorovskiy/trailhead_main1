@@ -1,0 +1,11 @@
+<!--c:parentExpr-->
+<aura:component >
+    <aura:attribute name="parentAttr" type="String" default="parent attribute"/>
+    <aura:attribute name="recordId" type="String" default="a06f400000499hLAAQ"/>
+    <!-- Instantiate the child component -->
+    <c:childExpr childAttr="{#v.parentAttr}" />
+       
+    <p>parentExpr parentAttr: {!v.parentAttr}</p>
+    <p><lightning:button label="Update parentAttr"
+          onclick="{!c.updateParentAttr}"/></p>
+</aura:component>

@@ -1,0 +1,348 @@
+.THIS .fillConfig svg{
+    fill: rgba(0, 68, 135, 1.0);
+}
+.THIS .ltngInput label{
+    display:none;
+}
+.THIS .fillConfig:hover{
+    background-color: rgb(244, 246, 249);
+}
+.THIS .ReportContainer{
+    background-color:white;
+    height:380px;
+    width:100%;
+    border-radius:5px;
+}
+@media only screen and (max-height: 1220px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:685px;
+     width:100%;
+     border-radius:5px;
+ }
+}
+@media only screen and (max-height: 1150px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:615px;
+     width:100%;
+     border-radius:5px;
+ }
+}
+@media only screen and (max-height: 1100px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:565px;
+     width:100%;
+     border-radius:5px;
+ }
+}
+@media only screen and (max-height: 1050px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:715px;
+     width:100%;
+     border-radius:5px;
+ }
+}
+@media only screen and (max-height: 1000px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:665px;
+     width:100%;
+     border-radius:5px;
+ }
+}
+@media only screen and (max-width: 800px) , (max-height: 950px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:610px;
+     width:100%;
+     border-radius:5px;
+ }
+}
+@media only screen and (max-height: 900px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:560px;
+     width:100%;
+     border-radius:5px;
+ }
+}
+@media only screen and (max-height: 850px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:510px;
+     width:100%;
+     border-radius:5px;
+ }
+}
+@media only screen and (max-height: 800px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:465px;
+     width:100%;
+     border-radius:5px;
+ }
+}
+@media only screen and (max-height: 750px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:410px;
+     width:100%;
+     border-radius:5px;
+ }
+}
+@media only screen and (max-height: 700px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:365px;
+     width:100%;
+     border-radius:5px;
+ }
+}@media only screen and (max-height: 650px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:315px;
+     width:100%;
+     border-radius:5px;
+ }
+}
+@media only screen and (max-height: 600px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:275px;
+     width:100%;
+     border-radius:5px;
+ }
+}@media only screen and (max-height: 550px) {
+
+ .THIS .ReportContainer{
+     background-color:white;
+     height:240px;
+     width:100%;
+     border-radius:5px;
+ }
+}
+.THIS .width200PX{
+    width:200px;
+}
+.THIS .width190PX{
+    width:140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align:center;
+    padding-left:10px;
+    padding-right:10px;
+}
+.THIS .width420PX{
+    width:420px;
+}.THIS .borderOutsetChild{
+    border-top: 1px solid white;
+
+}.THIS .borderOutsetChildRIGHT{
+   border-right: 1px solid black;
+}
+.THIS .width100PX{
+    width:100px;
+}
+.THIS .width57PX{
+    width:45px;
+}
+.THIS .width20PX{
+     width:20px;
+ }
+ .THIS .borderHeader{
+     border-top: 1px solid rgb(167, 164, 162);
+     border-bottom: 1px solid rgb(167, 164, 162);
+     font-weight: 700;
+     font-size: 13px;
+ }
+ .THIS .borderHeaderWeekly{
+     border-bottom: 1px solid rgb(167, 164, 162);
+     font-weight: 700;
+     font-size: 13px;
+ }
+ .THIS .subBorderHeader{
+     font-weight: 500;
+     background-color:#7F7F7F;
+     color:white;
+     border-right: 1px solid black;
+         border-top: 1px solid black;
+ }
+ .THIS .borderWhite{
+         margin: 0;
+         padding: 0;
+ }
+ .THIS .HeaderDimGray{
+    background-color: black;
+    color: white;
+ }
+ .THIS .timelineHeader{
+    background-color: #548DD4;
+    color: white;
+    font-weight: 600;
+    font-style:italic;
+ }
+ .THIS .TDColor1{
+    background-color: #CCD0F7;
+ }
+ .THIS .TDColor2{
+    background-color: #FAD4CC;
+ }
+ .THIS .TDColor3{
+    background-color: #FFE598;
+ }
+ .THIS .TDColor4{
+    background-color: #8DB3E2;
+ }
+ .THIS .TDColor5{
+    background-color: #C2D69B;
+ }
+ .THIS .TDColor6{
+    background-color: #B2A1C7;
+ }
+ .THIS .p25px{
+    padding-top:25px;
+ }
+ .THIS .timelineBorder{
+ }
+ .THIS .slds-page-header__detail-block {
+    padding-right: 1rem;
+    padding-left: 1rem;
+ }
+ .THIS .inputEdit {
+        border: 1px solid rgb(191, 187, 187);
+        width:50%;
+        line-height: 0;
+        min-height: 0;
+ }
+ .THIS .style-7::-webkit-scrollbar
+ {
+     width: 10px;
+     height: 10px;
+     background-color: #F5F5F5;
+ }
+
+ .THIS .style-7::-webkit-scrollbar-thumb
+ {
+     border-radius: 10px;
+     background-image: -webkit-gradient(linear,
+     left bottom,
+     left top,
+     color-stop(0.44, rgb(122,153,217)),
+     color-stop(0.72, rgb(73,125,189)),
+     color-stop(0.86, rgb(28,58,148)));
+ }
+
+
+
+ .THIS .wrapper {
+   position: relative;
+   -webkit-transform: translateZ(0); /* webkit flicker fix */
+   -webkit-font-smoothing: antialiased; /* webkit text rendering fix */
+ }
+
+
+ /* This bridges the gap so you can mouse into the tooltip without it disappearing */
+ .THIS .tooltip {
+    background: #fff;
+    /*bottom: 100%;*/
+    color: #000;
+    display: block;
+    /*left: 10px;*/
+    margin-bottom: 15px;
+    /*opacity: 0;*/
+        /*height: 175px;*/
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 2px;
+        padding-bottom: 3px;
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    -webkit-transform: translateY(10px);
+       -moz-transform: translateY(10px);
+        -ms-transform: translateY(10px);
+         -o-transform: translateY(10px);
+            transform: translateY(10px);
+    -webkit-transition: all .25s ease-out;
+       -moz-transition: all .25s ease-out;
+        -ms-transition: all .25s ease-out;
+         -o-transition: all .25s ease-out;
+            transition: all .25s ease-out;
+    -webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+       -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+        -ms-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+         -o-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+     z-index: 9999;
+     border-radius: 10px;
+ }
+
+.THIS .tooltip:before {
+bottom: -20px;
+content: " ";
+display: block;
+height: 20px;
+left: 0;
+position: absolute;
+width: 100%;
+}
+
+.THIS .tooltip:after {
+ border-left: solid transparent 10px;
+ border-right: solid transparent 10px;
+ border-top: solid #fff 10px;
+ bottom: -10px;
+ content: " ";
+ height: 0;
+ left: 50%;
+ margin-left: -13px;
+ position: absolute;
+ width: 0;
+}
+
+.THIS .campaignHeader:hover {
+    -moz-box-shadow:    inset 0 0 10px #000000;
+      -webkit-box-shadow: inset 0 0 10px #000000;
+      box-shadow:         inset 0 0 10px #000000;
+}
+
+
+.THIS .text {
+  position: relative;
+  color: black;
+  width: 270px; /* Could be anything you like. */
+}
+
+.THIS .text-concat {
+  position: relative;
+  display: inline-block;
+  word-wrap: break-word;
+  overflow: hidden;
+  max-height: 3.6em; /* (Number of lines you want visible) * (line-height) */
+  line-height: 1.2em;
+  text-align:justify;
+}
+
+.THIS .text.ellipsis::after {
+  content: "...";
+  position: absolute;
+  right: -12px;
+  bottom: 4px;
+}

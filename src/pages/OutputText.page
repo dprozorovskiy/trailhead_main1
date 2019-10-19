@@ -1,0 +1,6 @@
+<apex:page >
+    <apex:outputText style="font-style:italic" value="This is {0} text with {1}.">
+       <apex:param value="{!$Setup.Url_Settings__c.URL__c}"/>
+       <apex:param value="arguments"/>
+    </apex:outputText>
+</apex:page>

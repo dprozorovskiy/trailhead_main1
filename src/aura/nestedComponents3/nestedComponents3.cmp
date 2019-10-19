@@ -1,0 +1,11 @@
+<!--c:nestedComponents3-->
+<aura:component >
+    <aura:attribute name="passthrough" type="String" default="passed attribute"/>
+    Observe!  Components within components!
+
+    <c:helloHTML />
+
+    <c:helloAttributes whom="{#v.passthrough}"/>
+
+    <c:helloAttributes whom="separate instance"/>
+</aura:component>

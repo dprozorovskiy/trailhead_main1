@@ -1,0 +1,12 @@
+<aura:component description="CampaignOverviewReport" implements="force:lightningQuickActionWithoutHeader,force:hasRecordId" access="global">
+    <style>
+        .slds-backdrop {
+        display: none !important;
+        }
+        .slds-modal__content {
+        display: none !important;
+        }
+    </style>
+    <aura:attribute name="recordId" type="String" />
+    <aura:handler value="{!this}" name="init" action="{!c.doInit}" />
+</aura:component>
